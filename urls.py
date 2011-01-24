@@ -7,7 +7,7 @@ from django.conf.urls.defaults import *
 urlpatterns = patterns('',
     # Example:
     #(r'^rssfilter/', include('rssfilter.foo.urls')),
-    (r'^(?P<feedName>\w+)\.rss$', 'filter.views.returnRssFeed'),
+    (r'^feed/(?P<feedUrl>.+)$', 'filter.views.returnRssFeed'),
     #(r'^(?P<feedName>\w+)\.rss$', 'filter.views.returnRssFeed'),
 
     # Uncomment the admin/doc line below to enable admin documentation:

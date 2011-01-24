@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+{# validated from http://feedvalidator.org #}
+
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+    <channel>
+        <title>{{ title }}</title>
+        <link>{{ link }}</link>
+        <description>{{ description }}</description>
+        <language>en-us</language>
+        <webMaster>davidhu91@gmail.com (David Hu)</webMaster>
+        <atom:link href="{{ selfLink }}" rel="self" type="application/rss+xml" />
+
+        {% for item in data %}
+        <item>
+            <title>{{ item.title }}</title>
+            <link>{{ item.link }}</link>
+            <description>{{ item.description }}</description>
+            <guid>{{ item.guid }}</guid>
+            <pubDate>{{ item.pubDate }}</pubDate>
+        </item>
+        {% endfor %}
+    </channel>
+</rss>
