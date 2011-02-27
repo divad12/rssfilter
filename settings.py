@@ -1,4 +1,5 @@
 # Django settings for rssfilter project.
+import os
 
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
@@ -6,6 +7,9 @@ TEMPLATE_DEBUG = DEBUG
 ADMINS = (
     # ('Your Name', 'your_email@domain.com'),
 )
+
+FS_ROOT = os.path.dirname(os.path.abspath(__file__))
+print(FS_ROOT)
 
 MANAGERS = ADMINS
 

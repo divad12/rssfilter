@@ -1,0 +1,29 @@
+<html>
+    <head>
+    </head>
+    <body>
+        {# Ah horrible multi-layered lists. make this look fancy. #}
+        <ul>
+            {% for source,bundles in data.items %}
+            <li>{{ source }}
+                <ul>
+                    {% for bundle,feeds in bundles.items %}
+                    <li><a href="{{ root }}/{{ bundle }}">{{ bundle }}</a>
+                        <ul>
+                            {% for feed in feeds %}
+                            <li>
+                                <a href="{{ feed.url }}">
+                                    {{ feed.url }}
+                                </a>
+                                - {{ feed.minScore }}
+                            </li>
+                            {% endfor %}
+                        </ul>
+                    </li>
+                    {% endfor %}
+                </ul>
+            {% endfor %}
+            </li>
+        </ul>
+    </body>
+</html>

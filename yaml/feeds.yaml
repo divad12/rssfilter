@@ -1,0 +1,32 @@
+--- # All feeds
+- reddit:
+    programming:
+        - url: http://reddit.com/r/programming
+          minScore: 40
+        - url: http://reddit.com/r/compsci
+          minScore: 30
+        - url: http://reddit.com/r/javascript
+          minScore: 30
+        - url: http://reddit.com/r/coding
+          minScore: 30
+        - url: http://reddit.com/r/hackers
+          minScore: 20
+        - url: http://reddit.com/r/vim
+          minScore: 20
+        - url: http://reddit.com/r/cpp
+          minScore: 20
+        - url: http://reddit.com/r/git
+          minScore: 15
+        - url: http://reddit.com/r/algorithms
+          minScore: 5
+    distractions:
+        - url: http://reddit.com/r/atheism
+          minScore: 1200
+        - url: http://reddit.com/r/reddit.com
+          minScore: 2000
+        - url: http://reddit.com/r/technology
+          minScore: 1400
+        - url: http://reddit.com/r/canada
+          minScore: 900
+        - url: http://reddit.com/r/geek
+          minScore: 800
