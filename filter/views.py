@@ -4,6 +4,7 @@ from django.http import HttpResponse
 import urllib
 import json
 import yaml
+import re
 from django.conf import settings
 from datetime import datetime
 from django.template import Context, Template
@@ -31,29 +32,26 @@ def serializeFeeds(feeds):
     return reduce(lambda accum, feed: accum + feed['url'] + ' (' +
         str(feed['minScore']) + '), ', feeds, '');
 
-# TODO: should probably go into models
+# TODO: this should probably go into models
 def redditRss(post, feedUrl):
-    x = post
-    comments = int(x['data']['num_comments'])
-    score = int(x['data']['score'])
-    permalink = REDDIT_HOST + str(x['data']['permalink'])
-    url = str(x['data']['url'])
+    data = post['data']
+    comments = int(data['num_comments'])
+    score = int(data['score'])
+    permalink = REDDIT_HOST + str(data['permalink'])
+    url = str(data['url'])
     link = permalink if comments > 200 or comments > score else url
-    selftext = unescapeHtml(str(x['data']['selftext_html'])) if x['data']['selftext_html'] else ''
+    selfHtml = unescapeHtml(str(data['selftext_html'])) if data['selftext_html'] else ''
 
     return {
-        'title': x['data']['title'],
+        'title': data['title'],
         'link': link,
-        'description': str(x['data']['score']) + ' = ' +
-            str(x['data']['ups']) + ' - ' +
-            str(x['data']['downs']) + '  |  ' +
-            str(x['data']['num_comments']) + '<br>\n' +
-            'From <a href="%s">%s</a><br><br>\n' % (feedUrl, feedUrl) +
-            '<a href="%s">[url]</a> ' % url +
-            '<a href="%s">[comments]</a><br>\n' % permalink +
-            selftext,
+        'description': '%d = %d - %d<br>\n'         % (data['score'], data['ups'], data['downs']) +
+            'From <a href="%s">%s</a><br><br>\n'    % (feedUrl, feedUrl) +
+            '<a href="%s">[url]</a> '               % url +
+            '<a href="%s">[%d comments]</a><br>\n'  % (permalink, comments) +
+            selfHtml,
         'guid': permalink,
-        'pubDate': format_date_time(x['data']['created']),
+        'pubDate': format_date_time(data['created']),
     }
 
 def returnRssFeed(request, bundle):
