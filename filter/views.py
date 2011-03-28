@@ -9,16 +9,52 @@ from datetime import datetime
 from django.template import Context, Template
 from wsgiref.handlers import format_date_time
 
+# From: http://stackoverflow.com/questions/275174/how-do-i-perform-html-decoding-encoding-using-python-django
+from htmlentitydefs import name2codepoint
+# for some reason, python 2.5.2 doesn't have this one (apostrophe)
+name2codepoint['#39'] = 39
+
+def unescapeHtml(s):
+    "unescape HTML code refs; c.f. http://wiki.python.org/moin/EscapingHtml"
+    return re.sub('&(%s);' % '|'.join(name2codepoint),
+        lambda m: unichr(name2codepoint[m.group(1)]), s)
+
 # TODO: attach valid rss http://feedvalidator.org emblem somewhere
 # TODO: experiment with rss input box
 # TODO: log hit stats, limit hits to conform to reddit api and be respectful etc.
 # TODO: caching
+# TODO: polymorphic OOP to support different feed sources (such as hacker news, techcrunch, etc.)
 
 REDDIT_HOST = 'http://reddit.com'
 
 def serializeFeeds(feeds):
     return reduce(lambda accum, feed: accum + feed['url'] + ' (' +
         str(feed['minScore']) + '), ', feeds, '');
+
+# TODO: should probably go into models
+def redditRss(post, feedUrl):
+    x = post
+    comments = int(x['data']['num_comments'])
+    score = int(x['data']['score'])
+    permalink = REDDIT_HOST + str(x['data']['permalink'])
+    url = str(x['data']['url'])
+    link = permalink if comments > 200 or comments > score else url
+    selftext = unescapeHtml(str(x['data']['selftext_html'])) if x['data']['selftext_html'] else ''
+
+    return {
+        'title': x['data']['title'],
+        'link': link,
+        'description': str(x['data']['score']) + ' = ' +
+            str(x['data']['ups']) + ' - ' +
+            str(x['data']['downs']) + '  |  ' +
+            str(x['data']['num_comments']) + '<br>\n' +
+            'From <a href="%s">%s</a><br><br>\n' % (feedUrl, feedUrl) +
+            '<a href="%s">[url]</a> ' % url +
+            '<a href="%s">[comments]</a><br>\n' % permalink +
+            selftext,
+        'guid': permalink,
+        'pubDate': format_date_time(x['data']['created']),
+    }
 
 def returnRssFeed(request, bundle):
     # this is only configured for Reddit currently
@@ -49,27 +85,12 @@ def returnRssFeed(request, bundle):
         posts = json.loads(fileStr)['data']['children']
         # TODO: unused var
         subreddit = posts[0]['data']['subreddit']
-        filtered += [{
-            'title': x['data']['title'],
-            'link': REDDIT_HOST + x['data']['permalink'],
-            'description': str(x['data']['score']) + ' = ' +
-                str(x['data']['ups']) + ' - ' +
-                str(x['data']['downs']) + '  |  ' +
-                str(x['data']['num_comments']) + '<br><br>\n' +
-                'From <a href="' + str(feed['url']) + '">' +
-                feed['url'] + '</a><br>' +
-                '<a href="' + str(x['data']['url']) + '">' +
-                str(x['data']['url']) + '</a><br>' +
-                (str(x['data']['selftext_html']) if x['data']['selftext_html'] else ''),
-            'guid': REDDIT_HOST + x['data']['permalink'],
-            'pubDate': format_date_time(x['data']['created']),
-            } for x in posts if x['data']['score'] >= minScore]
+        filtered += [redditRss(x, feed['url']) for x in posts if x['data']['score'] >= minScore]
 
     context = Context({
         'data': filtered,
         'title': bundle + ' - a filtered bundle',
-        'description': 'A bundle of filtered feeds related to ' + bundle +':' +
-            serializeFeeds(feeds),
+        'description': 'A bundle of filtered feeds related to %s: %s' % (bundle, serializeFeeds(feeds)),
         # TODO: should not be hardcoded
         'link': request.get_host() + '/projects/rssfilter',
         'selfLink': request.build_absolute_uri(),
@@ -89,6 +110,3 @@ def allFeeds(request):
     })
     template = Template(open(settings.FS_ROOT + '/templates/all_feeds.html', 'r').read())
     return HttpResponse(template.render(context))
-
-
-
