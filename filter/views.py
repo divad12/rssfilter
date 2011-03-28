@@ -38,8 +38,8 @@ def redditRss(post, feedUrl):
     comments = int(data['num_comments'])
     score = int(data['score'])
     permalink = REDDIT_HOST + str(data['permalink'])
-    url = str(data['url'])
-    link = permalink if comments > 200 or comments > score else url
+    contentUrl = str(data['url'])
+    link = permalink if comments > 200 or comments > score else contentUrl
     selfHtml = unescapeHtml(str(data['selftext_html'])) if data['selftext_html'] else ''
 
     return {
@@ -47,7 +47,7 @@ def redditRss(post, feedUrl):
         'link': link,
         'description': '%d = %d - %d<br>\n'         % (data['score'], data['ups'], data['downs']) +
             'From <a href="%s">%s</a><br><br>\n'    % (feedUrl, feedUrl) +
-            '<a href="%s">[url]</a> '               % url +
+            '<a href="%s">[link]</a> '              % contentUrl +
             '<a href="%s">[%d comments]</a><br>\n'  % (permalink, comments) +
             selfHtml,
         'guid': permalink,
