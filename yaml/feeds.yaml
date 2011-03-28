@@ -26,7 +26,10 @@
           minScore: 2000
         - url: http://reddit.com/r/technology
           minScore: 1400
-        - url: http://reddit.com/r/canada
-          minScore: 900
         - url: http://reddit.com/r/geek
           minScore: 800
+        - url: http://reddit.com/r/canada
+          minScore: 500
+        - url: http://reddit.com/r/android
+          minScore: 200
+
