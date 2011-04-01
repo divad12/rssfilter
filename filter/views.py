@@ -39,7 +39,7 @@ def redditRss(post):
     score = int(data['score'])
     permalink = REDDIT_HOST + str(data['permalink'])
     contentUrl = str(data['url'])
-    link = permalink if comments > 200 or comments > score else contentUrl
+    link = permalink if ((comments > 200) or (comments > score)) else contentUrl
     selfHtml = unescapeHtml(str(data['selftext_html'])) if data['selftext_html'] else ''
 
     return {
