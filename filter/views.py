@@ -33,7 +33,7 @@ def serializeFeeds(feeds):
         str(feed['minScore']) + '), ', feeds, '');
 
 # TODO: this should probably go into models
-def redditRss(post, feedUrl):
+def redditRss(post):
     data = post['data']
     comments = int(data['num_comments'])
     score = int(data['score'])
@@ -45,8 +45,8 @@ def redditRss(post, feedUrl):
     return {
         'title': data['title'],
         'link': link,
-        'description': '%d = %d - %d<br>\n'         % (data['score'], data['ups'], data['downs']) +
-            'From <a href="%s">%s</a><br><br>\n'    % (feedUrl, feedUrl) +
+        'description': '%d = %d - %d<br>\n'         % (score, data['ups'], data['downs']) +
+            'From /r/%s<br>\n'                          % data['subreddit'] +
             '<a href="%s">[link]</a> '              % contentUrl +
             '<a href="%s">[%d comments]</a><br>\n'  % (permalink, comments) +
             selfHtml,
@@ -83,7 +83,7 @@ def returnRssFeed(request, bundle):
         posts = json.loads(fileStr)['data']['children']
         # TODO: unused var
         subreddit = posts[0]['data']['subreddit']
-        filtered += [redditRss(x, feed['url']) for x in posts if x['data']['score'] >= minScore]
+        filtered += [redditRss(x) for x in posts if x['data']['score'] >= minScore]
 
     context = Context({
         'data': filtered,
